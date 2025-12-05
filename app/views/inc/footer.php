@@ -1,0 +1,1 @@
+<a href="#PATH#user/logout" class="btn boton boton-cerrar">Cerrar sesión</a>
