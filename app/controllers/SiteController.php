@@ -1,31 +1,35 @@
-<?php
+<?php 
 namespace app\controllers;
-use app\core\Response;
+use \Controller;
+use app\models\CategoriaModel;
 
-class SiteController {
-
-    // Página de inicio público (si HomeController es más de dashboard, este puede ser la portada)
-    public function actionIndex() {
-        Response::render('site', 'index'); // carpeta site, vista index.php
+class SiteController extends Controller
+{
+    // Constructor
+    public function __construct(){
+        // self::$sessionStatus = SessionController::sessionVerificacion();
     }
 
-    // Página de contacto
-    public function actionContact() {
-        Response::render('site', 'contact'); // carpeta site, vista contact.php
-    }
+	public static function head(){
+		static::path();
+		$head = file_get_contents(APP_PATH.'/views/inc/head.php');
+		$head = str_replace('#PATH#', self::$ruta, $head);
+		return $head;
+	}
+	public static function header(){
+		static::path();
+		$header = file_get_contents(APP_PATH.'/views/inc/header.php');
+		$header = str_replace('#PATH#', self::$ruta, $header);
+		return $header;
+	}
 
-    // Página "Acerca de"
-    public function actionAbout() {
-        Response::render('site', 'about'); // carpeta site, vista about.php
-    }
+	public static function footer() {
+		static::path();
+		$footer = file_get_contents(APP_PATH.'/views/inc/footer.php');
+		$footer =str_replace('#PATH#', self::$ruta, $footer);
+		return $footer;
+	}
 
-    // Página de login (si no querés un controlador separado)
-    public function actionLogin() {
-        Response::render('site', 'login'); // carpeta site, vista login.php
-    }
-
-    // Página de registro (opcional)
-    public function actionRegister() {
-        Response::render('site', 'register'); // carpeta site, vista register.php
-    }
+	public static function menu(){
+	}
 }

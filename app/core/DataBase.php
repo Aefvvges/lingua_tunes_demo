@@ -1,9 +1,7 @@
 <?php
-namespace app\core;
-
-use PDO;
-use PDOException;
-
+/**
+ * Conexión con la Base de Datos utilizando PDO
+ */
 class DataBase
 {
     private static $host = "localhost";
@@ -11,76 +9,82 @@ class DataBase
     private static $dbuser = "root";
     private static $dbpass = "";
 
-    private static $dbh = null; // Handler de la base
+    private static $dbh = null; // Database handler
     private static $error;
 
-    // Conectar a la base (singleton)
+    // Obtener una instancia de la conexión PDO
     private static function connection()
     {
         if (self::$dbh === null) {
-            $dsn = "mysql:host=" . self::$host . ";dbname=" . self::$dbname . ";charset=utf8mb4";
-            $options = [
+            $dsn = "mysql:host=" . self::$host . ";dbname=" . self::$dbname;
+            $opciones = [
                 PDO::ATTR_PERSISTENT => true,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
             ];
 
             try {
-                self::$dbh = new PDO($dsn, self::$dbuser, self::$dbpass, $options);
+                self::$dbh = new PDO($dsn, self::$dbuser, self::$dbpass, $opciones);
+                self::$dbh->exec('SET NAMES utf8');
                 self::$dbh->exec('SET time_zone = "-03:00";');
             } catch (PDOException $e) {
                 self::$error = $e->getMessage();
-                throw new \Exception("❌ Error de conexión a la base de datos: " . self::$error);
+                throw new Exception("Error de conexión: " . self::$error);
             }
         }
         return self::$dbh;
     }
 
-    // Consultas SELECT → devuelve objetos
+    // Ejecutar una consulta con parámetros
     public static function query($sql, $params = [])
     {
-        $stmt = self::prepareAndExecute($sql, $params);
-        return $stmt->fetchAll(PDO::FETCH_OBJ);
+        $statement = self::prepareAndExecute($sql, $params);
+        return $statement->fetchAll(PDO::FETCH_OBJ);
     }
 
-    // INSERT, UPDATE, DELETE → devuelve filas afectadas
+    // Ejecutar un SQL que no requiere obtener resultados
     public static function execute($sql, $params = [])
     {
         return self::prepareAndExecute($sql, $params)->rowCount();
     }
 
-    // Devuelve el último ID insertado
-    public static function lastInsertId()
+    // Obtener el número de registros afectados
+    public static function rowCount($sql, $params = [])
     {
-        return self::connection()->lastInsertId();
+        return self::prepareAndExecute($sql, $params)->rowCount();
     }
 
-    // Ejecuta múltiples operaciones en transacción
-    public static function transaction($queries)
+    // Obtener nombres de columnas de una tabla
+    public static function getColumnsNames($table)
+    {
+        $sql = "SELECT column_name FROM information_schema.columns WHERE table_name = :table";
+        return self::query($sql, ['table' => $table]);
+    }
+
+    // Ejecutar una transacción
+    public static function ejecutar($sql)
     {
         $dbh = self::connection();
         try {
             $dbh->beginTransaction();
-            foreach ($queries as $query) {
-                $stmt = $dbh->prepare($query['sql']);
-                $stmt->execute($query['params'] ?? []);
-            }
+            $statement = $dbh->prepare($sql);
+            $statement->execute();
             $dbh->commit();
-            return true;
+            return ['state' => true, 'notification' => 'Operación exitosa'];
         } catch (PDOException $e) {
             $dbh->rollBack();
-            throw new \Exception("❌ Error en transacción: " . $e->getMessage());
+            return ['state' => false, 'notification' => $e->errorInfo[2] ?? 'Error desconocido'];
         }
     }
 
-    // Método interno: preparar + ejecutar
+    // Preparar y ejecutar una consulta con manejo de excepciones
     private static function prepareAndExecute($sql, $params = [])
     {
-        $stmt = self::connection()->prepare($sql);
+        $statement = self::connection()->prepare($sql);
         try {
-            $stmt->execute($params);
+            $statement->execute($params);
         } catch (PDOException $e) {
-            throw new \Exception("❌ Error en la consulta SQL: " . $e->getMessage() . "<br>Consulta: $sql");
+            throw new Exception("Error en la consulta: " . $e->getMessage());
         }
-        return $stmt;
+        return $statement;
     }
 }

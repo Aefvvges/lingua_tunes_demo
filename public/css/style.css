@@ -28,7 +28,7 @@ nav {
     background-color: var(--color-secundario);
 }
 
-.nav-item:hover {
+.nav-link:hover, .nav-item:hover {
     color: var(--color-terceario);
 }
 
@@ -86,19 +86,8 @@ nav {
     border: 1px solid #ccc;
 }
 
-/* Mensajes de error y éxito */
-.form-error {
-    color: red;
-    margin-bottom: 10px;
-    font-size: 0.9em;
-}
-
-.alert-success {
-    color: green;
-}
-
 /* Botones */
-.btn {
+.boton {
     font-size: 16px;
     font-family: inherit;
     background-color: var(--color-primario);
@@ -112,11 +101,23 @@ nav {
     cursor: pointer;
 }
 
-.btn-cerrar {
+.boton-cerrar {
     background-color: var(--color-secundario);
 }
 
-.btn:hover {
+.boton-cancelar {
+    background-color: #7f7592;
+}
+
+.boton-subir {
+    background-color: #76d6b6;
+}
+
+.boton-eliminar {
+    background-color: rgb(180, 42, 95);
+}
+
+.boton:hover {
     background-color: var(--color-complementario);
     color: black;
 }
@@ -191,6 +192,10 @@ nav {
     background-color: var(--color-complementario);
     color: var(--color-terceario);
     border-color: transparent;
+}
+
+.tarjeta-perfil {
+    background-color: var(--color-terceario);
 }
 
 /* Responsivo */
