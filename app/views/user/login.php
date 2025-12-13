@@ -18,7 +18,7 @@
                     </div>
                 <?php endif; ?>
 
-            <form method="POST" action="" class="form-1">
+            <form method="POST" action="/lingua_tunes_demo/user/login" class="form-1">
                 <h1 class="titulo-1 text-center">Inicia Sesión</h1>
 
                 <label for="usuario">Usuario:</label>
@@ -37,7 +37,7 @@
         </div>
 
         <div class="lado-2">
-            <img src="<?=$path?>img/fondo-2.png" alt="Fondo azul">
+            <img src="/lingua_tunes_demo/public/img/fondo-2.png" alt="Fondo azul">
         </div>
     </div>
 </main>

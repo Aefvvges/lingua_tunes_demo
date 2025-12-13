@@ -6,7 +6,7 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="#PATH#home/inicio"><i class="fa-solid fa-house"></i></a>
+                        <a class="nav-link" aria-current="page" href="/lingua_tunes_demo"><i class="fa-solid fa-house"></i></a>
                     </li>
                     <li class="nav-item">
                         <form class="form-inline d-flex" action="/action_page.php">
@@ -21,7 +21,7 @@
                         <a class="nav-link" href="#"><i class="fa-solid fa-gear"></i></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fa-solid fa-people-group"></i></a>
+                        <a class="nav-link" href="#PATH#home/about"><i class="fa-solid fa-people-group"></i></a>
                     </li>
                 </ul>
             </div>

@@ -156,8 +156,8 @@ nav {
     color: var(--color-terceario);
 }
 
-/* Botones de artista/productor */
-.boton-artista, .boton-productor {
+/* Botones de artista/album */
+.boton-artista, .boton-album {
     color: var(--color-terceario);
     padding: 5px 10px;
     border-radius: 8px;
@@ -166,7 +166,7 @@ nav {
     transition: 0.3s ease;
 }
 
-.boton-artista:hover, .boton-productor:hover {
+.boton-artista:hover, .boton-album:hover {
     color: var(--color-complementario);
     box-shadow: none;
 }
@@ -196,6 +196,22 @@ nav {
 
 .tarjeta-perfil {
     background-color: var(--color-terceario);
+}
+
+.contenedor-about {
+    background-color: var(--color-secundario);
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.mi-lista {
+    background-color: var(--color-terceario);
+    border-radius: 8px;        /* Opcional, bordes redondeados */
+    padding: 0.5rem;           /* Espaciado interno */
+}
+.mi-lista .list-group-item {
+    background-color: transparent; /* Para que el fondo del ul se vea */
+    border: none;                  /* Sin bordes */
 }
 
 /* Responsivo */

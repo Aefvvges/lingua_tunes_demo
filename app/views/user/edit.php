@@ -55,35 +55,35 @@ if (!$usuario) {
                     <?php endif; ?>
 
 
-                    <form action="<?= $path ?>user/edit" method="POST">
+                    <form action="/lingua_tunes_demo/user/update" method="POST">
                         <div class="mb-3">
                             <label for="usuario" class="form-label">Nombre de usuario</label>
-                            <input type="text" name="usuario" class="form-control" value="<?= htmlspecialchars($usuario->usuario) ?>" required>
+                            <input type="text" name="usuario" class="form-control" value="<?= htmlspecialchars($usuario->usuario ?? '') ?>" required>
                         </div>
                             
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre</label>
-                            <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($usuario->nombre) ?>" required>
+                            <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($usuario->nombre ?? '') ?>" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="apellido" class="form-label">Apellido</label>
-                            <input type="text" name="apellido" class="form-control" value="<?= htmlspecialchars($usuario->apellido) ?>" required>
+                            <input type="text" name="apellido" class="form-control" value="<?= htmlspecialchars($usuario->apellido ?? '') ?>" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($usuario->email) ?>" required>
+                            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($usuario->email ?? '') ?>" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="telefono" class="form-label">Teléfono</label>
-                            <input type="text" name="telefono" class="form-control" value="<?= htmlspecialchars($usuario->telefono) ?>" required>
+                            <input type="text" name="telefono" class="form-control" value="<?= htmlspecialchars($usuario->telefono ?? '') ?>" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
-                            <input type="date" name="fecha_nacimiento" class="form-control" value="<?= htmlspecialchars($usuario->fecha_nacimiento) ?>" required>
+                            <input type="date" name="fecha_nacimiento" class="form-control" value="<?= htmlspecialchars($usuario->fecha_nacimiento ?? '') ?>" required>
                         </div>
 
                         <div class="mb-3">

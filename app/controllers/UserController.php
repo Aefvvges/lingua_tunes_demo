@@ -15,7 +15,7 @@ class UserController extends Controller
     // --- Helpers
     private function authRequired() {
         if (!isset($_SESSION['id'])) {
-            header("Location: " . self::$ruta . "user/login");
+            header("Location: /lingua_tunes_demo/user/login");
             exit;
         }
     }
@@ -83,9 +83,13 @@ class UserController extends Controller
         $usuarios = DataBase::query($sql);
 
         $head = SiteController::head();
+        $header = SiteController::header();
+        $footer = SiteController::footer();
         Response::render($this->viewDir(__NAMESPACE__), "index", [
             "title" => $this->title . 'Usuarios',
             "head"  => $head,
+            "header" => $header,
+            "footer" => $footer,
             "usuarios" => $usuarios
         ]);
     }
@@ -170,145 +174,127 @@ class UserController extends Controller
         ]);
     }
 
+        // --- Login
+        public function actionLogin() {
+            $errores = [];
+            if (isset($_SESSION['id'])) {
+                header("Location: /lingua_tunes_demo/");
+                exit;
+            }
 
-    // --- Login
-    public function actionLogin() {
-        $errores = [];
-        if (isset($_SESSION['id'])) {
-            header("Location: /lingua_tunes_demo/home/inicio");
-            exit;
-        }
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $usuario = trim($_POST['usuario'] ?? '');
+                $password = trim($_POST['contrasena'] ?? '');
+                if (!$usuario) $errores['usuario'] = 'El usuario es obligatorio';
+                if (!$password) $errores['contrasena'] = 'La contraseña es obligatoria';
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $usuario = trim($_POST['usuario'] ?? '');
-            $password = trim($_POST['contrasena'] ?? '');
-            if (!$usuario) $errores['usuario'] = 'El usuario es obligatorio';
-            if (!$password) $errores['contrasena'] = 'La contraseña es obligatoria';
-
-            if (empty($errores)) {
-                $user = UserModel::findUsername($usuario);
-                if ($user) {
-                    if (!self::checkActivo($user->email)) {
-                        $errores['general'] = 'El usuario no existe';
-                    } elseif (password_verify($password, $user->contrasena)) {
-                        $_SESSION['id'] = $user->id;
-                        $_SESSION['usuario'] = [
-                            "id" => $user->id,
-                            "usuario" => $user->usuario,
-                            "nombre" => $user->nombre,
-                            "apellido" => $user->apellido,
-                            "email" => $user->email,
-                            "telefono" => $user->telefono,
-                            "fecha_nacimiento" => $user->fecha_nacimiento
-                        ];
-                        header("Location: /lingua_tunes_demo/home/inicio");
-                        exit;
+                if (empty($errores)) {
+                    $user = UserModel::findUsername($usuario);
+                    if ($user) {
+                        if (!self::checkActivo($user->email)) {
+                            $errores['general'] = 'El usuario no existe';
+                        } elseif (password_verify($password, $user->contrasena)) {
+                            $_SESSION['id'] = $user->id;
+                            $_SESSION['usuario'] = [
+                                "id" => $user->id,
+                                "usuario" => $user->usuario,
+                                "nombre" => $user->nombre,
+                                "apellido" => $user->apellido,
+                                "email" => $user->email,
+                                "telefono" => $user->telefono,
+                                "fecha_nacimiento" => $user->fecha_nacimiento
+                            ];
+                            header("Location: /lingua_tunes_demo");
+                            exit;
+                        } else {
+                            $errores['general'] = 'Usuario o contraseña incorrectos';
+                        }
                     } else {
                         $errores['general'] = 'Usuario o contraseña incorrectos';
                     }
-                } else {
-                    $errores['general'] = 'Usuario o contraseña incorrectos';
                 }
             }
+
+            $head = SiteController::head();
+            $path = static::path();
+            Response::render($this->viewDir(__NAMESPACE__), 'login', [
+                'title' => 'Iniciar sesión',
+                'head' => $head,
+                'errores' => $errores,
+                'path' => $path
+            ]);
         }
 
-        $head = SiteController::head();
-        $path = static::path();
-        Response::render($this->viewDir(__NAMESPACE__), 'login', [
-            'title' => 'Iniciar sesión',
-            'head' => $head,
-            'errores' => $errores,
-            'path' => $path
-        ]);
-    }
+        public function actionLogout() {
+            session_unset();
+            session_destroy();
+            header("Location: /lingua_tunes_demo/user/login");
+            exit;
+        }
 
-    public function actionLogout() {
-        session_unset();
-        session_destroy();
-        header("Location: /lingua_tunes_demo/user/login");
-        exit;
-    }
+    // Perfil
+    public function actionProfile() {
+        $this->authRequired();
+        $id = $_SESSION['id'];
 
-    // --- Perfil y edición unificados
-    private function renderUserForm($view, $data, $errores = []) {
-        $id = $_SESSION['id'] ?? null;
-        if (!$id) $this->action404();
-
-        $usuarioBD = UserController::getUser($id);
-
-        // En caso de que devuelva false
+        $usuarioBD = self::getUser($id);
         if (!$usuarioBD) $this->action404();
 
         $fotoNombre = UserModel::obtenerFoto($id);
-        $fotoNombre = $fotoNombre ? basename ($fotoNombre) : null;
-
-        // Ruta base pública
-        define('BASE_URL', '/lingua_tunes_demo/');
+        $fotoNombre = $fotoNombre ? basename($fotoNombre) : null;
 
         $rutaFoto = ($fotoNombre && file_exists(__DIR__ . "/../../public/img/uploads/profile_photos/" . $fotoNombre))
-            ? BASE_URL . "img/uploads/profile_photos/" . htmlspecialchars($fotoNombre)
-            : BASE_URL . "img/default_profile.png";
+            ? '/lingua_tunes_demo/img/uploads/profile_photos/' . htmlspecialchars($fotoNombre)
+            : '/lingua_tunes_demo/img/default_profile.png';
 
         $head = SiteController::head();
         $header = SiteController::header();
         $footer = SiteController::footer();
-        $path = static::path();
 
-        $usuarioBDArray = (array) $usuarioBD;
-        $dataArray = (array) $data;
-        $usuarioMerge = array_merge($usuarioBDArray, $dataArray);
-
-        Response::render($this->viewDir(__NAMESPACE__), $view, [
-            'title' => $view === 'profile' ? 'Mi Perfil' : 'Editar Perfil',
+        Response::render($this->viewDir(__NAMESPACE__), 'profile', [
+            'title' => 'Mi Perfil',
             'head' => $head,
             'header' => $header,
             'footer' => $footer,
-            'usuario' => (object)$usuarioMerge,
+            'usuario' => $usuarioBD,
             'rutaFoto' => $rutaFoto,
-            'path' => $path,
-            'errores' => $errores
+            'path' => static::path(),
         ]);
     }
 
-    public function actionProfile() {
-        $id = $_SESSION['id'] ?? null;
-        $usuario = UserController::getUser($id);
-        $this->renderUserForm('profile', (array)$usuario);
-    }
-
+    // Editar perfil
     public function actionEdit() {
-        $id = $_SESSION['id'] ?? null;
-        $usuarioBD = UserController::getUser($id);
-        $data = [
-            'usuario' => $_POST['usuario'] ?? $usuarioBD->usuario,
-            'nombre' => $_POST['nombre'] ?? $usuarioBD->nombre,
-            'apellido' => $_POST['apellido'] ?? $usuarioBD->apellido,
-            'email' => $_POST['email'] ?? $usuarioBD->email,
-            'telefono' => $_POST['telefono'] ?? $usuarioBD->telefono,
-            'fecha_nacimiento' => $_POST['fecha_nacimiento'] ?? $usuarioBD->fecha_nacimiento
-        ];
+        $this->authRequired();
+        $id = $_SESSION['id'];
 
-        $errores = [];
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $userModel = new UserModel();
-            $erroresFormato = $this->validarUsuario($data, 'editar');
-            $erroresExistencia = [];
-            if ($userModel->existeUsuario($data['usuario'], $id)) $erroresExistencia[] = "El nombre de usuario ya existe.";
-            if ($userModel->existeEmail($data['email'], $id)) $erroresExistencia[] = "El email ya está registrado.";
-            $errores = array_merge($erroresFormato, $erroresExistencia);
+        $usuarioBD = self::getUser($id);
+        if (!$usuarioBD) $this->action404();
 
-            if (empty($errores)) {
-                $userModel->editar($id, $data);
-                $_SESSION['usuario'] = array_merge($_SESSION['usuario'], $data);
-                header("Location: /lingua_tunes_demo/user/profile");
-                exit;
-            }
-        }
-        $this->renderUserForm('edit', $data, $errores);
+        $fotoNombre = UserModel::obtenerFoto($id);
+        $fotoNombre = $fotoNombre ? basename($fotoNombre) : null;
+
+        $rutaFoto = ($fotoNombre && file_exists(__DIR__ . "/../../public/img/uploads/profile_photos/" . $fotoNombre))
+            ? '/lingua_tunes_demo/img/uploads/profile_photos/' . htmlspecialchars($fotoNombre)
+            : '/lingua_tunes_demo/img/default_profile.png';
+
+        $head = SiteController::head();
+        $header = SiteController::header();
+        $footer = SiteController::footer();
+
+        Response::render($this->viewDir(__NAMESPACE__), 'edit', [
+            'title' => 'Editar Perfil',
+            'head' => $head,
+            'header' => $header,
+            'footer' => $footer,
+            'usuario' => $usuarioBD,
+            'rutaFoto' => $rutaFoto,
+            'path' => static::path(),
+        ]);
     }
 
     // --- Update photo
     public function actionUpdatePhoto() {
+        error_log("ENTRÓ A actionUpdatePhoto");
         $this->authRequired();
         $userId = $_SESSION['id'];
 
@@ -332,6 +318,41 @@ class UserController extends Controller
         header("Location: /lingua_tunes_demo/user/edit");
         exit;
     }
+    public function actionUpdate() {
+    $this->authRequired();
+    $id = $_SESSION['id'];
+
+    $data = [
+        'usuario' => trim($_POST['usuario' ?? '']),
+        'nombre' => trim($_POST['nombre'] ?? ''),
+        'apellido' => trim($_POST['apellido'] ?? ''),
+        'email' => trim($_POST['email'] ?? ''),
+        'telefono' => trim($_POST['telefono'] ?? ''),
+        'fecha_nacimiento' => trim($_POST['fecha_nacimiento'] ?? '')
+    ];
+
+    $errores = $this->validarUsuario($data, 'editar'); // si querés validar
+    if(empty($errores)){
+        (new UserModel())->editar($id, $data);
+        header("Location: /lingua_tunes_demo/user/profile");
+        exit;
+    } else {
+        $head = SiteController::head();
+        $header = SiteController::header();
+        $footer = SiteController::footer();
+        Response::render($this->viewDir(__NAMESPACE__), 'edit', [
+            'title' => 'Editar Perfil',
+            'head' => $head,
+            'header' => $header,
+            'footer' => $footer,
+            'usuario' => $data,
+            'rutaFoto' => UserModel::obtenerFoto($id),
+            'path' => static::path(),
+            'errores' => $errores
+        ]);
+    }
+}
+
 
     // --- Password recovery
     public function actionSolicitarRecuperacion() {

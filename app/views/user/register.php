@@ -82,7 +82,7 @@
             </div>
 
             <div class="lado-2">
-                <img src="<?= $path ?>img/fondo-1.png" alt="Fondo azul">
+                <img src="/lingua_tunes_demo/public/img/fondo-1.png" alt="Fondo azul">
             </div>
         </div>
     </main>

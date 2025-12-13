@@ -7,6 +7,6 @@
 <body>
     <h1>Error 404 - Página no encontrada</h1>
     <p>La vista solicitada no existe.</p>
-    <a href="#PATH#home/inicio">Volver al inicio</a>
+    <a href="/lingua_tunes_demo">Volver al inicio</a>
 </body>
 </html>

@@ -21,15 +21,19 @@ class MusicModel extends Model {
         $sql = "
             SELECT 
                 c.id, 
-                c.nombre AS cancion, 
-                a.nombre AS album, 
+                c.titulo AS cancion, 
+                a.id AS album_id,
+                a.titulo AS album, 
+                ar.id AS artista_id,
                 ar.nombre AS artista, 
                 c.youtube_id
             FROM canciones c
             JOIN albumes a ON c.album_id = a.id
             JOIN artistas ar ON a.artista_id = ar.id
-            ORDER BY c.nombre ASC
+            ORDER BY c.titulo ASC
         ";
+
+
         $result = DataBase::query($sql);
 
         $musicas = [];
@@ -53,8 +57,10 @@ class MusicModel extends Model {
         $sql = "
             SELECT 
                 c.id, 
-                c.nombre AS cancion, 
-                a.nombre AS album, 
+                c.titulo AS cancion, 
+                a.id AS album_id,
+                a.titulo AS album, 
+                ar.id AS artista_id,
                 ar.nombre AS artista, 
                 c.youtube_id
             FROM canciones c
@@ -63,6 +69,7 @@ class MusicModel extends Model {
             WHERE c.id = :id
             LIMIT 1
         ";
+
         $result = DataBase::query($sql, [':id' => $id]);
 
         if ($result) {

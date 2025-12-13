@@ -1,37 +1,43 @@
 <?php
 namespace app\controllers;
 
-use app\models\MusicModel;
+use app\models\AlbumModel;
 use \Controller;
 use \Response;
 use app\controllers\SiteController;
 
-class MusicController extends Controller {
+class AlbumController extends Controller {
 
-    // listar todas las canciones
+    // listar albumes
     public function actionIndex($var = null) {
-        $canciones = MusicModel::all();
+        $albumes = AlbumModel::all();
 
         $head = SiteController::head();
         $header = SiteController::header();
         $footer = SiteController::footer();
         $path = self::path();
 
-        Response::render("music", "index", [
-            'title' => 'Todas las canciones',
+        Response::render("albumes", "index", [
+            'title' => 'Álbumes',
             'head' => $head,
             'header' => $header,
             'footer' => $footer,
-            'canciones' => $canciones,
-            'path' => $path
+            'path' => $path,
+            'albumes' => $albumes
         ]);
     }
 
-    // mostrar canción individual
-    public function actionShow($id, $var = null) {
-        $cancion = MusicModel::find($id);
+    // mostrar album y sus canciones
+    public function actionShow($id = null, $var = null) {
 
-        if (!$cancion) {
+        if (!$id) {
+            $this->action404();
+            return;
+        }
+
+        $album = AlbumModel::find($id);
+
+        if (!$album) {
             $this->action404();
             return;
         }
@@ -41,13 +47,14 @@ class MusicController extends Controller {
         $footer = SiteController::footer();
         $path = self::path();
 
-        Response::render("music", "show", [
-            'title' => $cancion->titulo,
+        Response::render("albumes", "show", [
+            'title' => $album->titulo,
             'head' => $head,
             'header' => $header,
             'footer' => $footer,
-            'musica' => $cancion,
-            'path' => $path
+            'path' => $path,
+            'album' => $album,
+            'canciones' => $album->canciones
         ]);
     }
 }
